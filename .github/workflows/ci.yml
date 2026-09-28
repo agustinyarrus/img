@@ -7,8 +7,9 @@
 # pruebas —con las imágenes de prueba generadas con ffmpeg, así no se saltea
 # ninguna—, que no dejen nada en el árbol, y el .exe tal como se publica, con
 # su versión y su SHA256. Con ese mismo .exe, los oráculos: Pillow, un
-# decodificador independiente (libwebp, giflib, libjpeg), contra las 18 WebP
-# con pérdida del estrés y contra cada imagen de prueba convertida.
+# decodificador independiente (libwebp para las WebP, libjpeg para los JPEG),
+# contra las 18 WebP con pérdida del estrés y contra cada imagen de prueba
+# convertida.
 name: ci
 
 on:

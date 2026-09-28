@@ -26,8 +26,8 @@
 
   La salida coincide al bit con el decodificador de referencia. La conversión estándar de Go trataba esas imágenes como un JPEG (rango completo y el croma del píxel más cercano) y los colores salían corridos hasta 20 niveles.
 - **Composición de GIF**: los cuadros suelen guardar solo el rectángulo que cambió. Se reconstruye cada cuadro completo aplicando el método de disposición del anterior: nada, restaurar al fondo (transparente) o restaurar al lienzo previo. Cuesta O(cuadros × píxeles).
-- **Salida GIF**: paleta de 256 colores con dithering de Floyd–Steinberg.
-- **Formatos opacos**: la transparencia se aplana sobre el fondo elegido (`--background`).
+- **Salida GIF**: la paleta fija de Plan 9 (256 colores) con dithering de Floyd–Steinberg; un GIF animado conserva cuadros, tiempos y bucle. La paleta no reserva un transparente: hacia GIF la transparencia se pierde ([PENDIENTE.md](PENDIENTE.md)).
+- **Formatos opacos**: hacia JPEG y BMP la transparencia se aplana sobre el fondo elegido (`--background`); PNG y TIFF la conservan.
 - **PNG**: compresión máxima por defecto; `--fast` cambia tamaño por velocidad.
 
 ## El núcleo de consola
@@ -38,6 +38,7 @@
   - la función de dibujo corre sin el candado del terminal (puede tomar el del estado de la herramienta);
   - `Println` nunca llama a la función de dibujo: reusa el último cuadro.
 - **Recorte seguro**: `ClipANSI` recorta una línea con escapes a N columnas visibles sin romper los colores. Las líneas vivas se cortan una columna antes del borde, para que el terminal no las parta y el conteo de líneas no se desfase.
+- **Renglones que no entran**: los errores (`✗`) se parten en palabras al ancho de la ventana, con las líneas de más alineadas después de la marca (`Term.Marked`); a un pipe van enteros. Antes la consola los cortaba donde caían.
 - **Barra**: resolución de 1/8 de columna (bloques `▏▎▍▌▋▊▉█`) con degradé.
 - **Tarjeta**: fondo apenas teñido, sin bordes.
 - **Formato es-AR**: miles con punto, decimales con coma, bytes en unidades decimales.

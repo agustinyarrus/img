@@ -1,7 +1,7 @@
 ﻿<#
 .SYNOPSIS
   Las imágenes de prueba, convertidas por img y comparadas píxel a píxel con
-  lo que decodifica Pillow (libwebp, giflib, libjpeg).
+  lo que decodifica Pillow (libwebp para las WebP, libjpeg para los JPEG).
 
 .DESCRIPTION
   Convierte a PNG, con el img.exe que se le pasa, los fixtures de
