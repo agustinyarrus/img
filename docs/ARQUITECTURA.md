@@ -67,8 +67,8 @@
 
 ### win/desk
 
-- El modo y el tamaño de la consola (lo que usa `tui` para saber si hay consola y cuánto mide) y el portapapeles, por `syscall`.
-- Las DLL que no son KnownDLL se cargan por ruta absoluta de System32. Con el nombre pelado, `LoadLibrary` buscaría primero junto al exe, y un DLL plantado ahí ganaría.
+- El modo y el tamaño de la consola (lo que usa `tui` para saber si hay consola y cuánto mide), por `syscall`.
+- Solo carga `kernel32.dll`, que es una KnownDLL: Windows la toma siempre de System32. Con cualquier otra DLL nombrada sin ruta, `LoadLibrary` buscaría primero junto al exe, y un DLL plantado ahí ganaría.
 - El envoltorio de las llamadas lleva `//go:uintptrescapes`: sin esa directiva, un búfer que viaja como `uintptr` puede quedar en la pila de la goroutine, y si la pila crece entre la conversión y la llamada, Windows escribe en la pila vieja.
 - Es chico a propósito: nada de red ni de lanzar procesos. Un test (`internal/tui/deps_test.go`) comprueba con `go list -deps` que ni `tui` ni el exe cargan `net`, `net/netip` u `os/exec`.
 
