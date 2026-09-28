@@ -10,12 +10,16 @@ import (
 	"testing"
 )
 
-// fxDir es donde se generaron los fixtures reales (ver la sesión); si no está,
-// el test se saltea sin fallar para que la suite corra en cualquier máquina.
+// fxDir es la carpeta de fixtures que genera scripts/fixtures.ps1:
+// IMG_FIXTURES si está definida, si no %TEMP%\img-fx. Si no existe, el test se
+// saltea sin fallar para que la suite corra en cualquier máquina.
 func fxDir(t *testing.T) string {
-	dir := filepath.Join(os.TempDir(), "navaja-fx")
+	dir := os.Getenv("IMG_FIXTURES")
+	if dir == "" {
+		dir = filepath.Join(os.TempDir(), "img-fx")
+	}
 	if _, err := os.Stat(dir); err != nil {
-		t.Skipf("no hay fixtures en %s (generalos con la corrida de la sesión)", dir)
+		t.Skipf("no hay fixtures en %s (generalos con scripts/fixtures.ps1)", dir)
 	}
 	return dir
 }

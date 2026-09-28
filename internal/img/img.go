@@ -31,7 +31,8 @@ type opciones struct {
 	trabajos  int
 }
 
-// Main es el punto de entrada del subcomando.
+// Main es el punto de entrada de img: interpreta args, hace el trabajo y
+// devuelve el código de salida.
 func Main(t *tui.Term, version string, args []string) int {
 	o := opciones{destino: "png", calidad: 90, fondo: "blanco"}
 	app := cli.New("img", version, "convierte imágenes entre formatos, en lote")
