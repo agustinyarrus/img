@@ -218,7 +218,7 @@ func porcentajeTamano(in, out int64) string {
 
 func fallo(t *tui.Term, err error) int {
 	t.Blank()
-	t.Line(t.Paint(tui.Rose, "✗ ") + t.Paint(tui.Text, err.Error()))
+	t.Lines(t.Marked("✗ ", tui.Rose, err.Error()))
 	t.Blank()
 	return cli.ExitFailure
 }
