@@ -15,9 +15,9 @@
   Requisito: ffmpeg (winget install Gyan.FFmpeg).
 
 .EXAMPLE
-  .\scriptsixtures.ps1                  # a %TEMP%\img-fx
-  .\scriptsixtures.ps1 -Dir D:x\img   # a otra carpeta; los tests la leen con:
-  $env:IMG_FIXTURES = 'D:x\img'; go test ./internal/imaging/
+  .\scripts\fixtures.ps1                  # a %TEMP%\img-fx
+  .\scripts\fixtures.ps1 -Dir D:\fx\img   # a otra carpeta; los tests la leen con:
+  $env:IMG_FIXTURES = 'D:\fx\img'; go test ./internal/imaging/
 #>
 [CmdletBinding()]
 param([string] $Dir)
