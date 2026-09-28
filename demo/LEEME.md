@@ -89,11 +89,17 @@ llega a capturar cada cuadro a tiempo y el video sale acelerado.
 
 ## Sin VHS
 
-La misma sesión se puede grabar a mano: una terminal de 100×30 con fondo `#0b0b0f` y Cascadia Mono
-(`wt --size 100,30 pwsh -NoProfile`), `Set-Location (.\preparar.ps1)` para armar la escena y
-entrar, `img *.webp *.gif -o png` y un grabador de pantalla como
-[ScreenToGif](https://www.screentogif.com). Al terminar, `.\preparar.ps1 -Limpiar` desde esta
-carpeta.
+La misma sesión se puede grabar a mano, con un grabador de pantalla como
+[ScreenToGif](https://www.screentogif.com) sobre una terminal de 100×30 con fondo `#0b0b0f` y
+Cascadia Mono (`wt --size 100,30 pwsh -NoProfile`). Desde esta carpeta:
+
+```powershell
+$demo = $PWD.Path
+$env:Path = "$demo\.escena\bin;$env:Path"
+Set-Location (.\preparar.ps1)            # arma la escena y entra
+img *.webp *.gif -o png
+Set-Location $demo; .\preparar.ps1 -Limpiar
+```
 
 ## Desarmar a mano
 
