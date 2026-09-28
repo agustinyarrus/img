@@ -219,15 +219,15 @@ Una insignia redonda con las esquinas transparentes, a JPEG sobre el fondo de un
   img  ·  convierte imágenes entre formatos, en lote                                        v1.0.0
 
 
-  ● 1 imagen encontrada   ● 1 por convertir   ● destino .jpeg
+  ● 1 imagen encontrada   ● 1 por convertir   ● destino .jpg
 
-  ✓ insignia.webp   webp → jpeg · 512×512 · 15,5 KB  (+889 %)
+  ✓ insignia.webp   webp → jpeg · 512×512 · 15,5 KB  (+550 %)
 
 
      img · jpeg
 
-     ● Convertidas      1          ● Cambio de peso   +889 %
-     ● Tamaño final     15,5 KB    ● Tiempo           10 ms
+     ● Convertidas      1          ● Cambio de peso   +550 %
+     ● Tamaño final     15,5 KB    ● Tiempo           12 ms
 ```
 
 ### Errores que ayudan
@@ -314,7 +314,7 @@ La regla: img no se contrasta consigo misma. Pillow, que decodifica las WebP con
 | WebP con pérdida | [`webp_stress.py`](internal/imaging/_oracle/webp_stress.py): 18 casos generados con Pillow, de 1×1 a 333×201, ruido de color puro, con y sin alfa, y bloques de color | 18 de 18 idénticos al bit a libwebp |
 | las imágenes de prueba (WebP sin y con pérdida, con alfa, GIF estático y animado, BMP, JPEG) | [`pixel_all.ps1`](internal/imaging/_oracle/pixel_all.ps1) + [`pixel_check.py`](internal/imaging/_oracle/pixel_check.py) | 6 de 6 iguales al bit; el JPEG, a 1 nivel (dos decodificadores de JPEG no tienen por qué coincidir al bit: la norma no fija el redondeo de la IDCT). Un control con el origen equivocado tiene que dar diferencias, y las da |
 
-- **56 pruebas de Go** (`go test ./...`). Las de `imaging` leen imágenes de prueba que genera [`scripts/fixtures.ps1`](scripts/fixtures.ps1) con ffmpeg; sin ellas, cinco se saltean y lo dicen.
+- **57 pruebas de Go** (`go test ./...`). Las de `imaging` leen imágenes de prueba que genera [`scripts/fixtures.ps1`](scripts/fixtures.ps1) con ffmpeg; sin ellas, cinco se saltean y lo dicen.
 - **CI en `windows-latest`** con el Go mínimo del `go.mod` ([`ci.yml`](.github/workflows/ci.yml)): formato, `go vet` (también para Linux), ffmpeg para las imágenes de prueba y todas las pruebas sin salteadas, el `.exe` con su versión y su SHA256, y los dos oráculos de Pillow sobre ese `.exe`.
 
 El detalle, con la lección de los 20 niveles de color: [docs/VERIFICACION.md](docs/VERIFICACION.md).

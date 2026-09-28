@@ -9,7 +9,7 @@ go test ./...
 .\build.ps1 -Test     # go vet + go test y después compila
 ```
 
-56 tests en `cli`, `fsx`, `textdist`, `tui`, `win/desk` e `imaging`. Cinco de `imaging` leen imágenes reales generadas con ffmpeg (formato y dimensiones por contenido, los 8 cuadros de un GIF animado compuestos a tamaño completo, ida y vuelta por PNG y GIF). Buscan la carpeta de `$env:IMG_FIXTURES` o, si no está definida, `%TEMP%\img-fx`; si no existe, se saltean sin fallar. Para generarla:
+57 tests en `cli`, `fsx`, `textdist`, `tui`, `win/desk`, `imaging` e `img` (el encabezado dice la extensión que se escribe). Cinco de `imaging` leen imágenes reales generadas con ffmpeg (formato y dimensiones por contenido, los 8 cuadros de un GIF animado compuestos a tamaño completo, ida y vuelta por PNG y GIF). Buscan la carpeta de `$env:IMG_FIXTURES` o, si no está definida, `%TEMP%\img-fx`; si no existe, se saltean sin fallar. Para generarla:
 
 ```powershell
 .\scripts\fixtures.ps1                    # necesita ffmpeg (winget install Gyan.FFmpeg)
@@ -88,7 +88,7 @@ Con el `img.exe` que compila este repo (1.0.0), en Windows 11 con Go 1.27.1, ffm
 | Qué | Resultado |
 |---|---|
 | `gofmt -l .`, `go vet ./...` (Windows y Linux) | limpios |
-| `go test ./...` con las imágenes de prueba | 56 de 56, ninguna salteada |
+| `go test ./...` con las imágenes de prueba | 57 de 57, ninguna salteada |
 | `webp_stress.py` | 18 de 18 idénticos a libwebp |
 | `pixel_all.ps1` sobre las imágenes de prueba | 7 de 7: seis iguales al bit, el JPEG a 1 nivel; el control con el origen equivocado da diferencias |
 | la CI simulada con Go 1.26.0 | todos los pasos en verde |

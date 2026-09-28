@@ -21,7 +21,7 @@ func resumenPlan(t *tui.Term, planes []plan, destino imaging.Format, o opciones)
 	chips := []tui.Chip{
 		{Text: tui.Count(int64(len(planes)), "imagen encontrada", "imágenes encontradas"), Dot: tui.Teal},
 		{Text: tui.Count(int64(convertibles), "por convertir", "por convertir"), Dot: tui.Lavender},
-		{Text: "destino ." + destino.String(), Dot: tui.Peach},
+		{Text: "destino " + destino.Ext(), Dot: tui.Peach}, // la extensión que se escribe: .jpg, no .jpeg
 	}
 	if o.frames {
 		chips = append(chips, tui.Chip{Text: "cuadro por archivo", Dot: tui.Sky})

@@ -1,6 +1,6 @@
 # img 1.0.0
 
-La primera versión de img como proyecto propio. Antes vivía en navaja, la suite de herramientas de consola para Windows; el código es el que se probó ahí (más dos cambios de presentación, cada uno con su prueba: la cabecera dice la versión con su `v`, y un error que no entra en la ventana se parte en palabras en vez de cortarse donde cae), ahora con su repo, su número de versión, su CI y su demo.
+La primera versión de img como proyecto propio. Antes vivía en navaja, la suite de herramientas de consola para Windows; el código es el que se probó ahí (más tres cambios de presentación, cada uno con su prueba: la cabecera dice la versión con su `v`; un error que no entra en la ventana se parte en palabras en vez de cortarse donde cae; y el encabezado de una tanda dice la extensión que se escribe, `.jpg`, donde decía `.jpeg`), ahora con su repo, su número de versión, su CI y su demo.
 
 img es para cuando tenés una carpeta de `.webp` que ningún programa quiere abrir, un GIF animado del que necesitás los cuadros o fotos que tienen que ser `.jpg` para un formulario. Convierte en lote desde la consola, en paralelo, sin subir nada a ningún lado.
 
@@ -41,7 +41,7 @@ En Git Bash o WSL, `sha256sum -c SHA256SUMS`. El `.exe` es reproducible: la mism
 ## Cómo se verificó
 
 - img no se contrasta consigo misma: Pillow, un decodificador independiente (libwebp para las WebP, libjpeg para los JPEG), compara píxel a píxel. 18 de 18 WebP con pérdida de estrés (de 1×1 a 333×201, ruido de color puro, con y sin alfa) idénticas al bit a libwebp; las imágenes de prueba convertidas, iguales al bit (el JPEG, a 1 nivel: dos decodificadores de JPEG no tienen por qué coincidir al bit).
-- 56 pruebas de Go, todas corriendo: las de `imaging` leen imágenes de prueba generadas con ffmpeg.
+- 57 pruebas de Go, todas corriendo: las de `imaging` leen imágenes de prueba generadas con ffmpeg.
 - CI en `windows-latest` con el Go mínimo del `go.mod`: formato, `go vet` (también para Linux), todas las pruebas sin salteadas, los dos oráculos y el `.exe` con su versión y su SHA256.
 
 El detalle, en [docs/VERIFICACION.md](https://github.com/agustinyarrus/img/blob/v1.0.0/docs/VERIFICACION.md); la arquitectura, en [docs/ARQUITECTURA.md](https://github.com/agustinyarrus/img/blob/v1.0.0/docs/ARQUITECTURA.md).
