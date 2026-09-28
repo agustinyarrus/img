@@ -42,7 +42,7 @@ En Git Bash o WSL, `sha256sum -c SHA256SUMS`. El `.exe` es reproducible: la mism
 
 - img no se contrasta consigo misma: Pillow, un decodificador independiente (libwebp para las WebP, libjpeg para los JPEG), compara píxel a píxel. 18 de 18 WebP con pérdida de estrés (de 1×1 a 333×201, ruido de color puro, con y sin alfa) idénticas al bit a libwebp; las imágenes de prueba convertidas, iguales al bit (el JPEG, a 1 nivel: dos decodificadores de JPEG no tienen por qué coincidir al bit).
 - 57 pruebas de Go, todas corriendo: las de `imaging` leen imágenes de prueba generadas con ffmpeg.
-- CI en `windows-latest` con el Go mínimo del `go.mod`: formato, `go vet` (también para Linux), todas las pruebas sin salteadas, los dos oráculos y el `.exe` con su versión y su SHA256.
+- CI configurada para `windows-latest` con el Go mínimo del `go.mod`: formato, `go vet` (también para Linux), todas las pruebas sin salteadas, los dos oráculos y el `.exe` con su versión y su SHA256. Esta versión se verificó con la misma secuencia en un clon limpio, antes de publicarla.
 
 El detalle, en [docs/VERIFICACION.md](https://github.com/agustinyarrus/img/blob/v1.0.0/docs/VERIFICACION.md); la arquitectura, en [docs/ARQUITECTURA.md](https://github.com/agustinyarrus/img/blob/v1.0.0/docs/ARQUITECTURA.md).
 
