@@ -1,0 +1,167 @@
+# La CI de img. Corre donde img existe, en un Windows de verdad, con el Go
+# que declara go.mod: la versión MÍNIMA (1.26.0, sin línea toolchain). Si pasa
+# con esa, `go install …@latest` anda con cualquier 1.26.x.
+#
+# Qué se mira, en orden: formato, go.mod y go.sum en regla, vet (también para
+# Linux: la conversión y la consola compilan fuera de Windows), todas las
+# pruebas —con las imágenes de prueba generadas con ffmpeg, así no se saltea
+# ninguna—, que no dejen nada en el árbol, y el .exe tal como se publica, con
+# su versión y su SHA256. Con ese mismo .exe, los oráculos: Pillow, un
+# decodificador independiente (libwebp, giflib, libjpeg), contra las 18 WebP
+# con pérdida del estrés y contra cada imagen de prueba convertida.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows · formato, vet, pruebas, build y oráculos
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      # El Go que instaló setup-go, y ningún otro (sin bajar toolchains).
+      GOTOOLCHAIN: local
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          # Una sola dependencia (golang.org/x/image), que se baja en segundos:
+          # compilar en frío es parte de lo que se prueba.
+          cache: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: ffmpeg, para las imágenes de prueba
+        # El runner no lo trae. El paquete de Chocolatey es el build
+        # "essentials" de gyan.dev, que incluye libwebp.
+        timeout-minutes: 10
+        run: |
+          choco install ffmpeg --no-progress -y
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: La máquina
+        timeout-minutes: 2
+        continue-on-error: true
+        run: |
+          go version
+          python --version
+          (ffmpeg -hide_banner -version | Select-Object -First 1)
+          "Windows $([Environment]::OSVersion.Version)"
+          $global:LASTEXITCODE = 0
+
+      - name: Formato (gofmt)
+        run: |
+          $mal = @(gofmt -l .)
+          if ($mal) {
+            gofmt -d .
+            foreach ($f in $mal) { "::error file=$($f -replace '\\', '/')::gofmt: sin formato (gofmt -w $f)" }
+            exit 1
+          }
+
+      - name: go.mod ordenado y go.sum verificado
+        run: |
+          go mod tidy -diff
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          go mod verify
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go vet para Linux (la conversión compila fuera de Windows)
+        env:
+          GOOS: linux
+        run: go vet ./...
+
+      - name: Imágenes de prueba
+        run: ./scripts/fixtures.ps1 -Dir "$env:RUNNER_TEMP\img-fx"
+
+      - name: Pruebas
+        env:
+          IMG_FIXTURES: ${{ runner.temp }}\img-fx
+        run: ./.github/pruebas.ps1 -Informe "$env:RUNNER_TEMP\pruebas.json"
+
+      - name: Guardar los eventos de las pruebas
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pruebas-${{ github.sha }}
+          path: ${{ runner.temp }}/pruebas.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Las pruebas no dejaron nada en el árbol
+        run: |
+          $sucio = @(git status --porcelain)
+          if ($sucio) { $sucio; '::error::las pruebas dejaron archivos en el repo'; exit 1 }
+
+      - name: build.ps1
+        run: |
+          # Los acentos y las marcas de build.ps1, en UTF-8 (la consola del runner es OEM).
+          try { [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false) } catch { }
+          ./build.ps1
+
+      - name: El .exe dice su versión y su commit
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          try { [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false) } catch { }
+          $version = [regex]::Match((Get-Content internal/version/version.go -Raw), 'Version\s*=\s*"([^"]+)"').Groups[1].Value
+          $quiere = "img $version+$(git rev-parse --short=7 HEAD)"
+          $dice = (./dist/img.exe --version | Out-String).Trim()
+          "img --version: $dice"
+          if ($dice -cne $quiere) { "::error::esperaba '$quiere'"; exit 1 }
+          # En una etiqueta, la etiqueta y el código dicen la misma versión.
+          if ($env:REF_TYPE -eq 'tag' -and $env:REF_NAME -cne "v$version") {
+            "::error::la etiqueta $env:REF_NAME no es la versión del código (v$version)"
+            exit 1
+          }
+
+      - name: Oráculos · Python y Pillow
+        run: |
+          # Las versiones con que se verificó, fijadas; solo ruedas (nada que compilar).
+          python -m pip install --no-input --only-binary=:all: -r internal/imaging/_oracle/requirements.txt
+
+      - name: Oráculo · 18 WebP con pérdida contra libwebp
+        run: python internal/imaging/_oracle/webp_stress.py dist/img.exe "$env:RUNNER_TEMP\webp-stress"
+
+      - name: Oráculo · las imágenes de prueba contra Pillow
+        run: ./internal/imaging/_oracle/pixel_all.ps1 -Exe dist/img.exe -Fx "$env:RUNNER_TEMP\img-fx" -Work "$env:RUNNER_TEMP\img-pixel"
+
+      - name: SHA256SUMS
+        run: |
+          $h = (Get-FileHash -Algorithm SHA256 dist/img.exe).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText("$PWD/dist/SHA256SUMS", "$h  img.exe`n")
+          Get-Content dist/SHA256SUMS
+
+      - name: Guardar el .exe
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: img-${{ github.sha }}
+          path: |
+            dist/img.exe
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 14

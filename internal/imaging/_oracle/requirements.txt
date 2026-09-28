@@ -1,0 +1,6 @@
+# Lo que necesitan los oráculos de img (pixel_check.py y webp_stress.py), con
+# las versiones con que se verificaron. Pillow decodifica con libwebp, libjpeg
+# y giflib: es el lector independiente contra el que se compara img.
+#   python -m pip install -r internal/imaging/_oracle/requirements.txt
+numpy==2.2.6
+pillow==12.3.0
